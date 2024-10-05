@@ -1,0 +1,44 @@
+#当前服务名称
+Name: im-edge-1
+#当前服务监听的节点端口
+ListenOn: 0.0.0.0:3000
+IPv4Prefix: "192.168.120"
+#IPv4Prefix: "192.168.210"
+Etcd:
+  Hosts:
+    - 127.0.0.1:2379
+  Key: "im-edge-1"
+Auth:
+  AccessSecret: ysjinroad
+  AccessExpire: 86400
+#作为生产者
+#将消息发送到kafka的接收消息的mq中，该mq是总mq
+SendMsgPusherConf:
+  Name: im-edge-1-SendMsg
+  Brokers:
+    - 192.168.120.1:9092
+  Topic: im-edge-SendMsg
+
+#作为消费者
+#消费来自系统的命令消息，和普通消息mq分开是为了具有时效性
+RecvCmdMsgConsumerConf:
+  Name: im-edge-1-RecvCmdMsg
+  Brokers:
+    - 192.168.120.1:9092
+  Group: im-edge-1
+  Topic: im-edge-1-RecvCmdMsg
+  Offset: first
+  Consumers: 3
+  Processors: 3
+
+#作为消费者
+#接收普通类型的消息（待发送消息）
+RecvCommonMsgConsumerConf:
+  Name: im-edge-1-RecvCommonMsg
+  Brokers:
+    - 192.168.120.1:9092
+  Group: im-edge-1
+  Topic: im-edge-1-RecvCommonMsg
+  Offset: first
+  Consumers: 3
+  Processors: 3

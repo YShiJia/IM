@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package websocket;
+
+option go_package = "./pbmessage";
+
+// protobuf 消息格式
+message PbMessage {
+  // 消息类型
+  uint32 MsgType = 1;
+  // 下面三个字段与客户端交互使用。
+  // 发送者id
+  string From = 2;
+  // 接收者id
+  string To = 3;
+  // 会话序列号
+  uint64 Seq = 4;
+  // 错误信息
+  string Err = 5;
+  bytes Data = 6;
+}
