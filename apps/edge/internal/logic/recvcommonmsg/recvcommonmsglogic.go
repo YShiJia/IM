@@ -10,7 +10,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/YShiJia/IM/apps/edge/internal/svc"
-	"github.com/YShiJia/IM/model/pbmessage"
+	"github.com/YShiJia/IM/pbmodel/pbmessage"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 

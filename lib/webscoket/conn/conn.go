@@ -79,6 +79,7 @@ func NewWsConn(upgrader *websocket.Upgrader, w http.ResponseWriter, r *http.Requ
 		ws:            ws,
 		connReadLock:  lock.NewSpinLock(),
 		connWriteLock: lock.NewSpinLock(),
+		// 标记: 连接模块消息编码方式
 		//encoder:               encoder.NewProtobufEncoder(),
 		encoder:               encoder.NewJsonEncoder(),
 		latestUseTime:         time.Now(),

@@ -9,7 +9,7 @@ package test
 import (
 	"fmt"
 	"github.com/YShiJia/IM/lib/encoder"
-	"github.com/YShiJia/IM/model/pbmessage"
+	"github.com/YShiJia/IM/pbmodel/pbmessage"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

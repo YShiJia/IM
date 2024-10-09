@@ -9,7 +9,7 @@ package server
 import (
 	"errors"
 	"fmt"
-	"github.com/YShiJia/IM/model/pbmessage"
+	"github.com/YShiJia/IM/pbmodel/pbmessage"
 )
 
 type ConnClientMsgHandler interface {

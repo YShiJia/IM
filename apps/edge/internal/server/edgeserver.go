@@ -20,7 +20,8 @@ import (
 	"github.com/YShiJia/IM/lib/wait"
 	"github.com/YShiJia/IM/lib/webscoket"
 	"github.com/YShiJia/IM/lib/webscoket/conn"
-	"github.com/YShiJia/IM/model/pbmessage"
+	"github.com/YShiJia/IM/model"
+	"github.com/YShiJia/IM/pbmodel/pbmessage"
 	"github.com/zeromicro/go-queue/kq"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/core/threading"
@@ -127,9 +128,9 @@ func (e *EdgeServer) PushReceiveMsg(key string, msg any) error {
 func (e *EdgeServer) wsConnHandler(c conn.Conn) {
 	uid, _ := c.GetValue(webscoket.WsConnectionIdentity)
 	threading.GoSafe(func() {
-		var msg pbmessage.PbMessage
 		for {
-			err := c.Receive(context.TODO(), &msg)
+			msg := new(pbmessage.PbMessage)
+			err := c.Receive(context.TODO(), msg)
 			if err != nil {
 				if errors.Is(err, conn.ErrConnectionClosed) {
 					return
@@ -137,7 +138,7 @@ func (e *EdgeServer) wsConnHandler(c conn.Conn) {
 					e.SvcCtx.Errorf("wsConnHandler receive msg error: %v", err)
 				}
 			}
-			e.ClientMsgChan <- &msg
+			e.ClientMsgChan <- msg
 			e.SvcCtx.Infof("wsConnHandler receive msg: %v, from user: %s", msg, uid)
 		}
 	})
@@ -169,12 +170,18 @@ func (e *EdgeServer) handleClientMsg() error {
 }
 
 func (e *EdgeServer) KqHeart() error {
-	//将自身服务Name作为key， IP地址作为value
+	// 获取本服务id地址
 	addr, err := ip.GetIPv4Addr(e.SvcCtx.IPv4Prefix)
 	if err != nil || len(addr) == 0 {
 		return fmt.Errorf("get ip error")
 	}
-	register := discovery.NewServerRegister(e.SvcCtx.Etcd.Key, e.SvcCtx.Etcd.Hosts, addr)
+	//将自身服务Name作为key， 接收消息队列配置信息作为value
+	edgemqinfo := &model.EdgeMQInfo{
+		RecvCmdMsgConsumerConf:    e.SvcCtx.RecvCmdMsgConsumerConf,
+		RecvCommonMsgConsumerConf: e.SvcCtx.RecvCommonMsgConsumerConf,
+		Address:                   addr[0],
+	}
+	register := discovery.NewServerRegister(e.SvcCtx.Etcd.Key, e.SvcCtx.Etcd.Hosts, edgemqinfo)
 	register.HeartBeat()
 	return nil
 }

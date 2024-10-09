@@ -10,7 +10,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/YShiJia/IM/model/pbmessage"
+	"github.com/YShiJia/IM/pbmodel/pbmessage"
+	"time"
 )
 
 var CmdMsgProcessor = newCmdMsgCenterHandler(
@@ -76,12 +77,14 @@ func (u *updateConnCmdMsgHandler) CmdMsgHandle(consumer *RecvCmdMsgConsumer, mes
 		if conn == nil {
 			continue
 		}
-		conn.Send(consumer.ctx, newUpdateConnCmdMsg())
+		conn.Send(consumer.ctx, newUpdateConnCmdMsg(key))
 	}
 	return nil
 }
-func newUpdateConnCmdMsg() *pbmessage.PbMessage {
+func newUpdateConnCmdMsg(to string) *pbmessage.PbMessage {
 	return &pbmessage.PbMessage{
 		MsgType: pbmessage.PbMessageType_UpdateConn,
+		To:      to,
+		Time:    time.Now().Unix(),
 	}
 }

@@ -8,7 +8,7 @@ package recvcommonmsg
 
 import (
 	"errors"
-	"github.com/YShiJia/IM/model/pbmessage"
+	"github.com/YShiJia/IM/pbmodel/pbmessage"
 )
 
 var CommonMsgProcessor = newCommonMsgCenterHandler(

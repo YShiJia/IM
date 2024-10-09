@@ -17,6 +17,7 @@ SendMsgPusherConf:
   Name: im-edge-1-SendMsg
   Brokers:
     - 192.168.120.1:9092
+#  整个边缘服务的集群都往这个mq中发送队列
   Topic: im-edge-SendMsg
 
 #作为消费者
