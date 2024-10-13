@@ -1,0 +1,17 @@
+Name: user
+Host: 0.0.0.0
+Port: 8888
+
+Redisx:
+  Host: 127.0.0.1:6379
+  Pass: ysjinroad
+
+StatusRpc:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: im-status-1
+
+JwtAuth:
+  AccessSecret: ysjinroad
+  AccessExpire: 86400

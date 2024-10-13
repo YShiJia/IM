@@ -1,0 +1,58 @@
+syntax = "v1"
+
+info(
+    title: "im 状态api服务"
+    author: "ysj"
+    email: "2239831438@qq.com"
+)
+
+type User {
+    SocialId string `json:"id"`
+    Nickname string `json:"nickname"`
+    Email string `json:"email"`
+}
+
+type (
+    RegisterReq {
+        Nickname string `json:"nickname"`
+        Email string `json:"email"`
+        Password string `json:"password"`
+        RePassword string `json:"rePassword"`
+    }
+    RegisterResp {
+        User User `json:"user"`
+        Token string `json:"token"`
+        Expire int64 `json:"expire"`
+    }
+)
+
+type (
+    LoginReq {
+        SocialId string `json:"id"`
+        Password string `json:"password"`
+    }
+    LoginResp {
+        User User `json:"user"`
+        Token string `json:"token"`
+        Expire int64 `json:"expire"`
+    }
+)
+
+type (
+    UserInfoReq {
+        SocialId string `json:"id"`
+    }
+    UserInfoResp {
+        Info User `json:"info"`
+    }
+)
+
+type (
+    WsConnInfoReq {
+        SocialId string `json:"id"`
+    }
+    WsConnResp {
+        Address string `json:"address"`
+    }
+)
+

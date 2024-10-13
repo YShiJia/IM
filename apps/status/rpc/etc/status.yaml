@@ -1,10 +1,10 @@
-Name: im-statusclient-1
+Name: im-status-1
 ListenOn: 0.0.0.0:5001
 
 Etcd:
   Hosts:
     - 127.0.0.1:2379
-  Key: im-statusclient-1
+  Key: im-status-1
 
 IMEdgePrefix:
   im-edge
@@ -22,11 +22,11 @@ JwtAuth:
 
 #作为消费者，处理来自边缘服务的消息
 SendMsgConsumerConf:
-  Name: im-statusclient-1-SendMsg
+  Name: im-status-1-SendMsg
   Brokers:
     - 192.168.120.1:9092
   #  整个状态服务集群共享这一个消费队列，该消费队列一旦宕机，整个IM系统不可用，TODO 后续需改进
-  Group: im-statusclient
+  Group: im-status
   Topic: im-edge-SendMsg
   Offset: first
   Consumers: 3

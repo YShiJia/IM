@@ -1,0 +1,42 @@
+syntax = "v1"
+
+info (
+	title:  "im 状态api服务"
+	author: "ysj"
+	email:  "2239831438@qq.com"
+)
+
+import (
+	"domain.api"
+)
+
+@server (
+	prefix: v1/user
+	group:  user
+)
+service user {
+	@doc "用户注册"
+	@handler register
+	post /register (RegisterReq) returns (RegisterResp)
+
+	@doc "用户登入"
+	@handler login
+	post /login (LoginReq) returns (LoginResp)
+}
+
+//need login
+@server (
+	prefix: v1/user
+	group:  user
+	jwt:    JwtAuth
+)
+service user {
+	@doc "获取用户信息"
+	@handler detail
+	get /detail (UserInfoReq) returns (UserInfoResp)
+
+	@doc "获取连接信息"
+	@handler wsconninfo
+	get /wsconninfo (WsConnInfoReq) returns (WsConnResp)
+}
+
