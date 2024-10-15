@@ -11,29 +11,14 @@ import (
 )
 
 @server (
-	prefix: v1/user
-	group:  user
-)
-service user {
-	@doc "用户注册"
-	@handler register
-	post /register (RegisterReq) returns (RegisterResp)
-
-	@doc "用户登入"
-	@handler login
-	post /login (LoginReq) returns (LoginResp)
-}
-
-//need login
-@server (
-	prefix: v1/user
-	group:  user
+	prefix: v1/status
+	group:  status
 	jwt:    JwtAuth
 )
-service user {
-	@doc "获取用户信息"
-	@handler detail
-	get /detail (UserInfoReq) returns (UserInfoResp)
+service status {
+	@doc "获取用户在线信息"
+	@handler useronline
+	get /useronline (UserOnlineReq) returns (UserOnlineResp)
 
 	@doc "获取连接信息"
 	@handler wsconninfo

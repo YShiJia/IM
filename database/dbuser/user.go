@@ -21,6 +21,7 @@ type User struct {
 	Id        int    `json:"id" gorm:"column:id"`
 	SocialId  string `json:"social_id" gorm:"column:social_id"`
 	Nickname  string `json:"nickname" gorm:"column:nickname"`
+	Password  string `json:"password" gorm:"column:password""`
 	Email     string `json:"email" gorm:"column:email"`
 	Status    int    `json:"status" gorm:"column:status"`
 	Gender    int    `json:"gender" gorm:"column:gender"`
@@ -30,4 +31,10 @@ type User struct {
 
 func (u *User) getTableName() string {
 	return "im_user"
+}
+
+// Check 检查字段是否完整有效
+func (u *User) Check() bool {
+
+	return true
 }

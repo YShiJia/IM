@@ -1,7 +1,31 @@
-/**
- * @author ysj
- * @email 2239831438@qq.com
- * @date 2024-10-07 13:52:12
- */
+package main
 
-package api
+import (
+	"flag"
+	"fmt"
+
+	"github.com/YShiJia/IM/apps/status/api/internal/config"
+	"github.com/YShiJia/IM/apps/status/api/internal/handler"
+	"github.com/YShiJia/IM/apps/status/api/internal/svc"
+
+	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/rest"
+)
+
+var configFile = flag.String("f", "etc/status.yaml", "the config file")
+
+func main() {
+	flag.Parse()
+
+	var c config.Config
+	conf.MustLoad(*configFile, &c)
+
+	server := rest.MustNewServer(c.RestConf)
+	defer server.Stop()
+
+	ctx := svc.NewServiceContext(c)
+	handler.RegisterHandlers(server, ctx)
+
+	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
+	server.Start()
+}

@@ -1,4 +1,4 @@
-package user
+package status
 
 import (
 	"context"
@@ -35,4 +35,5 @@ func (l *WsconninfoLogic) Wsconninfo(req *types.WsConnInfoReq) (resp *types.WsCo
 	return &types.WsConnResp{
 		Address: address.Address,
 	}, nil
+	return
 }

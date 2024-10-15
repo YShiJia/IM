@@ -4,7 +4,7 @@ package handler
 import (
 	"net/http"
 
-	user "github.com/YShiJia/IM/apps/status/api/internal/handler/user"
+	status "github.com/YShiJia/IM/apps/status/api/internal/handler/status"
 	"github.com/YShiJia/IM/apps/status/api/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -14,37 +14,19 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
-				// 用户登入
-				Method:  http.MethodPost,
-				Path:    "/login",
-				Handler: user.LoginHandler(serverCtx),
-			},
-			{
-				// 用户注册
-				Method:  http.MethodPost,
-				Path:    "/register",
-				Handler: user.RegisterHandler(serverCtx),
-			},
-		},
-		rest.WithPrefix("/v1/user"),
-	)
-
-	server.AddRoutes(
-		[]rest.Route{
-			{
-				// 获取用户信息
+				// 获取用户在线信息
 				Method:  http.MethodGet,
-				Path:    "/detail",
-				Handler: user.DetailHandler(serverCtx),
+				Path:    "/useronline",
+				Handler: status.UseronlineHandler(serverCtx),
 			},
 			{
 				// 获取连接信息
 				Method:  http.MethodGet,
 				Path:    "/wsconninfo",
-				Handler: user.WsconninfoHandler(serverCtx),
+				Handler: status.WsconninfoHandler(serverCtx),
 			},
 		},
 		rest.WithJwt(serverCtx.Config.JwtAuth.AccessSecret),
-		rest.WithPrefix("/v1/user"),
+		rest.WithPrefix("/v1/status"),
 	)
 }
