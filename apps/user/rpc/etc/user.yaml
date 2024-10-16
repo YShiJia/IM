@@ -7,7 +7,7 @@ Etcd:
   Key: user.rpc
 
 Redisx:
-  Host: 127.0.0.1:16379
+  Host: 127.0.0.1:6379
   Pass: ysjinroad
 
 Mysql:

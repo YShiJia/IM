@@ -29,7 +29,7 @@ type User struct {
 	DeletedAt int64  `json:"deleted_at" gorm:"column:deleted_at"`
 }
 
-func (u *User) getTableName() string {
+func (u *User) TableName() string {
 	return "im_user"
 }
 
