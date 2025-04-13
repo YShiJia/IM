@@ -1,0 +1,160 @@
+version: '3'
+
+#在当前目录打开终端，使用命令 docker-compose up -d 即可运行； 停止服务：docker-compose down
+networks:
+  im:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.120.0.0/16
+
+services:
+  redis:
+    image: redis:6.0
+    restart: always
+    container_name: im.redis
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      # 本地文件(本文件位置起) ： 容器文件
+      - ./components/redis/datadir:/data
+      - ./components/redis/conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./components/redis/logs:/logs
+    command:
+      # 不带配置文件可以使用 redis-server --requirepass yourpass 配置认证密码
+      redis-server /usr/local/etc/redis/redis.conf
+#    ports:
+#      - '6379:6379'
+    networks:
+      im:
+        ipv4_address: 10.120.0.20
+  mysql:
+    image: mysql:8.0.18
+    restart: always
+    container_name: im.mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=heathyang # root用户密码
+    #      - TZ=Asia/Shanghai # 设置容器时区 我这里通过下面挂载方式同步的宿主机时区和时间了,这里忽略
+    volumes:
+      - ./components/mysql/log:/var/log/mysql
+      - ./components/mysql/data:/var/lib/mysql
+      - ./components/mysql/conf.d:/etc/mysql/conf.d
+      - /etc/localtime:/etc/localtime:ro # 时钟同步，ro只读
+#    ports:
+#      - 3306:3306
+    networks:
+      im:
+        ipv4_address: 10.120.0.30
+  etcd:
+    image: bitnami/etcd:3.5
+    container_name: im.etcd
+    restart: always
+    environment:
+      # 时区设置
+      - TZ=Asia/Shanghai
+      # 允许无认证访问
+      - ALLOW_NONE_AUTHENTICATION=yes
+      # etcd 客户端访问URL
+      - ETCD_ADVERTISE_CLIENT_URLS=http://127.0.0.1:2379
+    volumes:
+      # 将数据映射到宿主机
+      - ./components/etcd/data:/bitnami/etcd/data
+    ports:
+      - 2379:2379
+    networks:
+      im:
+        ipv4_address: 10.120.0.40
+  kafka:
+    image: apache/kafka:3.8.0
+    container_name: im.kafka
+    restart: always
+    environment:
+      # 设置时区
+      TZ: Asia/Shanghai
+      # 设置 Kafka 节点的 ID，通常在集群模式下，每个 Kafka 节点有唯一的 ID
+      KAFKA_NODE_ID: 1
+      # 设置 Kafka 进程的角色。broker 是处理消息的节点，controller 负责管理 Kafka 集群的元数据
+      KAFKA_PROCESS_ROLES: broker,controller
+      # 定义 Kafka 监听的协议和端口
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      # 设置 Kafka 广播给客户端的地址，即 Kafka 监听器的公开地址。
+      # 在测试环境中，宿主机连接容器，需要将ip指定为10.120.0.50，在容器通讯过程中，可以将ip指定为im.kafka
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      # 设置控制器监听器的名称
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      #  配置不同监听器的安全协议映射
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      # 配置 Kafka 控制器的选举成员，<broker-id>@<hostname>:<port>
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      # 配置 Kafka 存储消费者偏移量的主题的副本因子
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      # 配置 Kafka 存储事务日志的主题的副本因子
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      # 设置 Kafka 在事务日志中至少需要多少个副本是在线的才算成功
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      # 设置 Kafka 消费者组初始平衡延迟的时间，单位为毫秒。0 表示没有延迟，立刻开始分配分区
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      # 设置 Kafka 默认主题的分区数。分区数越多，Kafka 可以处理的并发消息数量就越多，但也会增加管理复杂度
+      KAFKA_NUM_PARTITIONS: 3
+    volumes:
+      # 将数据映射到宿主机
+      - ./components/kafka/conf:/etc/kafka/docker
+      - ./components/kafka/data:/tmp/kafka-logs
+    ports:
+      - 9092:9092
+    networks:
+      im:
+        ipv4_address: 10.120.0.50
+  minio:
+    image: minio/minio:latest
+    container_name: im.minio
+    restart: always
+    environment:
+      MINIO_ROOT_USER: heathyang
+      MINIO_ROOT_PASSWORD: heathyang
+    volumes:
+      - ./components/minio/data:/data
+      - ./components/minio/conf:/root/.minio
+    ports:
+      - 9000:9000
+      - 9001:9001
+    networks:
+      im:
+        ipv4_address: 10.120.0.60
+    command: server /data --console-address ":9001"
+
+#  zookeeper:
+#    image: wurstmeister/zookeeper
+#    ports:
+#      - 2181:2181
+#    container_name: zookeeper
+#    volumes:
+#      - /etc/localtime:/etc/localtime
+#    environment:
+#      TZ: Asia/Shanghai
+#    restart: always
+#    networks:
+#      im:
+#        ipv4_address: 10.120.0.60
+#
+#  kafka2:
+#    image: wurstmeister/kafka
+#    container_name: kafka
+#    restart: always
+#    ports:
+#      - 9092:9092
+#    environment:
+#      TZ: Asia/Shanghai
+#      KAFKA_BROKER_ID: 0
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#      KAFKA_CREATE_TOPICS: "ws2ms_chat:8:1,ms2ps_chat:8:1,msg_to_mongo:8:1"
+#      KAFKA_ADVERTISED_LISTENERS: INSIDE://10.120.0.50:9092
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT"
+#      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+#      KAFKA_LISTENERS: INSIDE://:9092
+#      KAFKA_HEAP_OPTS: "-Xmx512M -Xms256M"
+#    depends_on:
+#      - zookeeper
+#    networks:
+#      im:
+#        ipv4_address: 10.120.0.50

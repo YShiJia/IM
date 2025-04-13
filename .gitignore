@@ -1,0 +1,17 @@
+# 忽略指定可执行文件
+*.out
+.idea/
+# etcd data
+/components/etcd/data/
+# redis data
+/components/redis/datadir/
+/components/redis/logs/
+# mysql data
+/components/mysql/data/
+/components/mysql/log/
+# kafka data
+/components/kafka/data/
+# minio data
+/components/minio/data/
+# log
+/logs

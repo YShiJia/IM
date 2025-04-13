@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package status;
+
+import "pbmodel/message.proto";
+
+option go_package = "./statusmodel";
+
+message Request {
+  string  ping = 1;
+}
+message Response {
+  string  pong = 1;
+}
+
+message UserOnlineRequest {
+  repeated string socialId = 1;
+}
+message UserOnlineResponse {
+  repeated string socialId = 1;
+}
+
+message ClientConnAddressRequest {
+  string socialId = 1;
+}
+message ClientConnAddressResponse {
+  string address = 1;
+}
+
+
+message ClientMsgSyncRequest {
+  string socialId = 1;
+  //区分是私聊消息还是群聊消息
+  int32 msgType = 2;
+  string fromId = 3;
+  //消息起始seq号
+  int64 begin = 4;
+  //消息结束seq号
+  int64 end = 5;
+}
+message ClientMsgSyncResponse {
+  repeated model.PbMessage messages = 1;
+}
+
+service Status {
+  rpc Ping(Request) returns (Response);
+  rpc UserOnline(UserOnlineRequest) returns (UserOnlineResponse);
+  rpc ClientConnAddress(ClientConnAddressRequest) returns (ClientConnAddressResponse);
+  rpc ClientMsgSync(ClientMsgSyncRequest) returns (ClientMsgSyncResponse);
+}

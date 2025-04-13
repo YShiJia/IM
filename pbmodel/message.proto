@@ -1,0 +1,24 @@
+//protoc --go_out=. message.proto
+
+syntax = "proto3";
+
+package model;
+
+option go_package = "./pbmessage";
+
+// protobuf 消息格式
+message PbMessage {
+  // 消息类型
+  uint32 MsgType = 1;
+  // 发送者id
+  string From = 2;
+  // 接收者id
+  string To = 3;
+  // 会话序列号
+  uint64 Seq = 4;
+  // 发送时间
+  int64 Time = 7;
+  // 错误信息
+  string Err = 5;
+  bytes Data = 6;
+}

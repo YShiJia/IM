@@ -1,0 +1,40 @@
+Name: user.rpc
+ListenOn: 0.0.0.0:8080
+
+Etcd:
+  Hosts:
+  - 127.0.0.1:2379
+  Key: user.rpc
+
+Redisx:
+  Host: 127.0.0.1:6379
+  Pass: ysjinroad
+
+Mysql:
+  Datasource: root:root@tcp(192.168.120.1:8006)/im?charset=utf8mb4
+
+Email:
+  # 发送者邮件
+  Username: "road2nb@163.com"
+  # 发送授权码
+  Password: "GUBBOHLUUYLECDME"
+  # 邮件服务商smtp服务域名
+  Host: "smtp.163.com"
+  # 邮件服务商smtp服务器开放端口
+  Port: "25"
+  # 验证码过期时间,五分钟
+  Expiration: 300
+  # 最大连接量
+  MaxClient: 3
+  # 发件平台名
+  TeamName: "YsjInRoad"
+  # 验证码长度
+  CodeLen: 6
+  # 调用邮件服务超时时间 second
+  ServerExpiration: 3
+  # 重复申请验证码间隔 second
+  Interval: 60
+
+JwtAuth:
+  AccessSecret: ysjinroad
+  AccessExpire: 86400
