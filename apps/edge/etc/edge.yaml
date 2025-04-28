@@ -10,7 +10,6 @@ GrpcPort: 50051
 # 运行环境: dev, test, beta，prod
 Env: dev
 
-
 # ws连接池最大大小，能维持连接的上限
 WebSocketConnPoolMaxSize: 1000
 

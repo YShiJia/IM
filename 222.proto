@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package enginex.core;
+
+option go_package = "tencent.com/protocols/woa/enginex/core";
+
+message DatasetColumn {
+  string name = 1 [json_name = "Name"];
+  bool is_hidden = 2 [json_name = "IsHidden"];
+  Widget widget = 3 [json_name = "Widget"];
+}
+
+message Widget {}

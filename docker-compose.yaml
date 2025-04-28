@@ -40,8 +40,8 @@ services:
       - ./components/mysql/data:/var/lib/mysql
       - ./components/mysql/conf.d:/etc/mysql/conf.d
       - /etc/localtime:/etc/localtime:ro # 时钟同步，ro只读
-#    ports:
-#      - 3306:3306
+    ports:
+     - 3306:3306
     networks:
       im:
         ipv4_address: 10.120.0.30
@@ -53,7 +53,9 @@ services:
       # 时区设置
       - TZ=Asia/Shanghai
       # 允许无认证访问
-      - ALLOW_NONE_AUTHENTICATION=yes
+      - ALLOW_NONE_AUTHENTICATION=no
+      - ETCD_AUTH_TOKEN=simple
+      - ETCD_ROOT_PASSWORD=heathyang
       # etcd 客户端访问URL
       - ETCD_ADVERTISE_CLIENT_URLS=http://127.0.0.1:2379
     volumes:

@@ -9,8 +9,7 @@ type Config struct {
 	zrpc.RpcServerConf
 
 	Redisx redis.RedisConf
-
-	Mysql struct {
+	Mysql  struct {
 		DataSource string
 	}
 }

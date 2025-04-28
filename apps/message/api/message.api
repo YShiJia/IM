@@ -1,0 +1,53 @@
+syntax = "v1"
+
+info (
+	title:  "im.message api 服务"
+	author: "ysj"
+	email:  "2239831438@qq.com"
+)
+
+@server (
+	prefix:     v1
+	group:      file
+	middleware: Auth
+)
+service message-api {
+	// 文件上传
+	@handler FileUpload
+	post /file/upload (FileUploadReq) returns (FileUploadResp)
+
+	// 文件下载
+	@handler FileDownload
+	post /file/download/:hash (FileDownloadReq) returns (FileDownloadResp)
+
+	// 文件上传前基本信息处理
+	@handler FileCheck
+	get /file/check/:hash (FileCheckReq) returns (FileCheckResp)
+}
+
+type FileUploadReq {
+	Hash     string `json:"hash,optional"`
+	FileName string `json:"name,optional"`
+	Size     int64  `json:"size,optional"`
+}
+
+type FileUploadResp {
+	Hash string `json:"identity"`
+}
+
+type FileCheckReq {
+	Hash string `json:"hash",path:"hash"`
+}
+
+type FileCheckResp {
+	Exists bool `json:"exists"`
+}
+
+type FileDownloadReq {
+	Hash string `json:"hash",path:"hash"`
+}
+
+type FileDownloadResp {
+	Data []byte `json:"data"`
+}
+

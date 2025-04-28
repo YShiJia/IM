@@ -13,6 +13,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	log "github.com/sirupsen/logrus"
+	"os"
 	"testing"
 )
 
@@ -41,8 +42,8 @@ func Test_minio(t *testing.T) {
 		createBucket(bucket)
 	}
 	//listBucket()
-	//FileUploader()
-	FileGet()
+	FileUploader()
+	//FileGet()
 
 }
 
@@ -71,7 +72,13 @@ func FileUploader() {
 	filePath := "/Design/IM/logs/tlog.log"
 	contextType := "application/text"
 
-	objectName, err := sign.FileSignatureBySHA256(filePath)
+	openFile, err := os.Open(filePath)
+	if err != nil {
+		log.Println("获取文件错误: ", err)
+	}
+	defer openFile.Close()
+
+	objectName, err := sign.FileSignatureBySHA256(openFile)
 	if err != nil {
 		log.Println("获取文件hash值错误: ", err)
 	}
