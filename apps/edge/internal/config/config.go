@@ -7,7 +7,6 @@
 package config
 
 import (
-	"github.com/YShiJia/IM/apps/edge/internal/model"
 	imModel "github.com/YShiJia/IM/model"
 	"time"
 )
@@ -17,9 +16,16 @@ const (
 	Authorization = "Authorization"
 )
 
+// kafka conf
+type EdgeKafkaConfig struct {
+	SendMessageQueue imModel.KafkaConfig
+	RecvMessageQueue imModel.KafkaConfig
+}
+
 type Config struct {
-	Name       string
-	Number     int // 本服务编号
+	Name   string
+	Number int // 本服务编号
+
 	NamePrefix string
 	IPPrefix   string // 本集群IP网段
 
@@ -39,7 +45,10 @@ type Config struct {
 
 	EtcdConf imModel.EtcdConfig
 
-	KafkaConf model.EdgeKafkaConfig
+	KafkaConf                   EdgeKafkaConfig
+	RecvMessageQueueTopicPrefix string
+
+	RedisUserInfoPrefix string
 
 	AuthConf imModel.AuthConfig
 }

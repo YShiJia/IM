@@ -6,6 +6,7 @@ import (
 	"fmt"
 	conf "github.com/YShiJia/IM/apps/edge/internal/config"
 	"github.com/YShiJia/IM/apps/edge/internal/dao"
+	"github.com/YShiJia/IM/apps/edge/internal/logic"
 	"github.com/YShiJia/IM/lib/ip"
 	imModel "github.com/YShiJia/IM/model"
 	"github.com/segmentio/kafka-go"
@@ -19,7 +20,7 @@ import (
 // 3. 创建对sendMsgQueue的Writer
 // 4. 创建对recvMsgQueue对Reader
 // 5. 将本edge服务的配置信息put到etcd中
-
+// 6. 消费recvMsgQueue的数据
 func InitEdge() error {
 	if err := getAndUseServeNumber(); err != nil {
 		return err
@@ -33,6 +34,7 @@ func InitEdge() error {
 	if err := registerInfoToEtcd(); err != nil {
 		return err
 	}
+	go logic.Send()
 	log.Info("init edge success")
 	return nil
 }
@@ -47,7 +49,7 @@ func getAndUseServeNumber() error {
 	}
 	conf.Conf.Number = number
 	conf.Conf.Name = fmt.Sprintf("%s-%d", conf.Conf.NamePrefix, number)
-	conf.Conf.KafkaConf.RecvMessageQueue.Topic = fmt.Sprintf("%s-%d", conf.Conf.KafkaConf.RecvMessageQueue.TopicPrefix, number)
+	conf.Conf.KafkaConf.RecvMessageQueue.Topic = fmt.Sprintf("%s-%d", conf.Conf.RecvMessageQueueTopicPrefix, number)
 	//conf.Conf.HttpPort = conf.Conf.HttpPort + number
 	return nil
 }
@@ -67,17 +69,18 @@ func createTopic() error {
 
 // 创建对sendMsgQueue的Writer & 创建对recvMsgQueue的Reader
 func createWriterAndReader() error {
-	// TODO: 中心服务负责创建 sendMsgQueue，暂时先不创建其writer
-	//w := &kafka.Writer{
-	//	Addr:         kafka.TCP(conf.Conf.KafkaConf.SendMessageQueue.Broker),
-	//	Topic:        conf.Conf.KafkaConf.SendMessageQueue.Topic,
-	//	RequiredAcks: kafka.RequireAll, // ack模式
-	//}
+	dao.SendMsgQueueWriter = &kafka.Writer{
+		Addr:         kafka.TCP(conf.Conf.KafkaConf.SendMessageQueue.Broker),
+		Topic:        conf.Conf.KafkaConf.SendMessageQueue.Topic,
+		RequiredAcks: kafka.RequireAll, // ack模式
+	}
 
 	// 创建recvMsgQueue的Reader
 	dao.RecvMsgQueueReader = kafka.NewReader(kafka.ReaderConfig{
-		Brokers:  []string{conf.Conf.KafkaConf.RecvMessageQueue.Broker},
-		GroupID:  conf.Conf.Name, // 使用本服务名作为消费者组id
+		Brokers: []string{conf.Conf.KafkaConf.RecvMessageQueue.Broker},
+		// 这里有一个薄弱点：当前是每一个edge都拥有自己的一个topic，都是从头开始消费
+		// 如果后续
+		GroupID:  conf.Conf.NamePrefix, // 统一使用edge作为消费者组id
 		Topic:    conf.Conf.KafkaConf.RecvMessageQueue.Topic,
 		MaxBytes: 10e6, // 10MB
 	})
@@ -97,13 +100,13 @@ func registerInfoToEtcd() error {
 		return fmt.Errorf("can not get local serve cluster ip addr")
 	}
 
-	si := imModel.ServeInfo{
-		Name:         conf.Conf.Name,
-		IP:           ips[0],
-		HttpPort:     conf.Conf.HttpPort,
-		GrpcPort:     conf.Conf.GrpcPort,
-		Type:         imModel.SERVE_TYPE_EDGE,
-		RecvMsgQueue: conf.Conf.KafkaConf.RecvMessageQueue,
+	si := imModel.ServiceInfo{
+		Name:             conf.Conf.Name,
+		IP:               ips[0],
+		HttpPort:         conf.Conf.HttpPort,
+		GrpcPort:         conf.Conf.GrpcPort,
+		Type:             imModel.SERVE_TYPE_EDGE,
+		RecvMessageQueue: conf.Conf.KafkaConf.RecvMessageQueue,
 	}
 
 	siData, err := json.Marshal(si)

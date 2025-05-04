@@ -8,7 +8,7 @@ package db
 
 import (
 	"fmt"
-	"github.com/YShiJia/IM/apps/message/api/model"
+	"github.com/YShiJia/IM/model"
 	"gorm.io/gorm"
 )
 

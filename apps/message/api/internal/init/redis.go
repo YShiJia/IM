@@ -1,15 +1,16 @@
 /**
  * @author ysj
  * @email 2239831438@qq.com
- * @createTime: 2025-04-23 13:09:11
+ * @date 2025-04-29 12:16:22
  */
 
-package rdb
+package init
 
 import (
 	"context"
 	"fmt"
 	conf "github.com/YShiJia/IM/apps/message/api/internal/config"
+	"github.com/YShiJia/IM/apps/message/api/internal/dao/redisdb"
 	"github.com/redis/go-redis/v9"
 	log "github.com/sirupsen/logrus"
 )
@@ -21,12 +22,12 @@ func InitRedis() error {
 		DB:       conf.Conf.RedisConf.Index,    // 数据库
 		PoolSize: conf.Conf.RedisConf.PoolSize, // 连接池大小
 	})
-	ctx, cancel := context.WithTimeout(context.Background(), conf.Conf.ReqTimeOut)
+	ctx, cancel := context.WithTimeout(context.Background(), conf.ReqTimeOut)
 	defer cancel()
 	if ping := rdb.Ping(ctx); ping.Err() != nil {
 		return fmt.Errorf("create redis client failed: %v", ping.Err())
 	}
-	RDB = rdb
+	redisdb.RDB = rdb
 	log.Info("connect to redis success")
 	return nil
 }

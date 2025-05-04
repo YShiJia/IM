@@ -1,6 +1,6 @@
 Name: message-api
 Host: 0.0.0.0
-Port: 13000
+Port: 14000
 #  最大连接数
 MaxConns: 1000
 # 服务器最大传输字节 10 MB
@@ -12,17 +12,17 @@ Timeout: 10000
 MaxFileBytes: 5
 # 总文件最大大小 MB
 MaxTotalFileBytes: 50
-
 # 集群网段
 IPPrefix: "10.120"
 
-
 # 本服务监听的节点端口
-HttpPort: 13000
+HttpPort: 14000
 GrpcPort: 50051
 
 # 运行环境: dev, test, beta，prod
 Env: dev
+
+EdgeNamePrefix: im-edge
 
 # redis conf
 RedisConf:
@@ -36,11 +36,12 @@ RedisConf:
 EtcdConf:
   Host: 10.120.0.40
   Port: 2379
+  Username: root
+  Password: heathyang
 
-KafkaConf:
+SendMessageQueue:
   Broker: 10.120.0.50:9092
   Topic: im-send-message-queue
-  TopicPrefix: ""
   Replication: 1
   Partition: 1
 
@@ -59,7 +60,6 @@ MinioConf:
   AccessKeyID: heathyang
   SecretAccessKey: heathyang
   UseSSL: false
-
 
 # auth info
 AuthConf:

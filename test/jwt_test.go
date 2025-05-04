@@ -16,9 +16,9 @@ import (
 
 func TestJwt(t *testing.T) {
 
-	secretKey := "ysjinroad"
+	secretKey := "heathyang"
 	iat := time.Now().Unix()
-	seconds := int64(time.Hour)
+	seconds := int64(time.Hour * 24 * 365)
 	payload := "testUid1"
 
 	token, err := jwt.GetJwtToken(secretKey, iat, seconds, payload)

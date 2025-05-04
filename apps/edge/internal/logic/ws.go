@@ -11,10 +11,12 @@ import (
 	"encoding/json"
 	conf "github.com/YShiJia/IM/apps/edge/internal/config"
 	"github.com/YShiJia/IM/apps/edge/internal/dao"
-	"github.com/YShiJia/IM/apps/edge/internal/model"
 	libWsconn "github.com/YShiJia/IM/lib/websocket/conn"
+	"github.com/YShiJia/IM/model"
+	"github.com/YShiJia/IM/model/ext"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
+	"github.com/segmentio/kafka-go"
 	log "github.com/sirupsen/logrus"
 	"sync"
 	"time"
@@ -59,7 +61,6 @@ func (cwc *CommunicateWithClient) Recv() {
 			}
 		}
 	}()
-
 	for {
 		recvType, data, err := cwc.WsConn.Receive() // 会阻塞,直到接收到消息或连接断开
 		// 接收数据
@@ -67,36 +68,44 @@ func (cwc *CommunicateWithClient) Recv() {
 			log.Errorf("conn[%s] recv error: %v", cwc.RequestId, err)
 			break
 		}
-		if recvType == websocket.CloseNormalClosure {
-			// 客户端要求连接断开
-			cwc.CloseCh <- struct{}{}
-			return
-		}
-		msg := &model.Message{}
+		// 重新开始计时
+		cwc.resetClientSilenceTimer()
+		log.Infof("conn[%s] recv type: %v, data: %s", cwc.RequestId, recvType, string(data))
+
+		msg := &ext.Message{}
 		if err := json.Unmarshal(data, msg); err != nil {
 			log.Errorf("conn[%s] recv data %s, unmarshal error: %v", cwc.RequestId, string(data), err)
 		}
-		// 重新开始计时
-		cwc.resetClientSilenceTimer()
-		log.Infof("conn[%s] recv msg: %v", cwc.RequestId, msg)
-		switch msg.MessageType {
+
+		switch msg.Type {
 		case model.MessageTypePing: // 心跳机制
 		case model.MessageTypeClose: // 关闭连接
 			log.Infof("conn[%s] recv close sign msg: %v", cwc.RequestId, msg)
 			cwc.CloseCh <- struct{}{}
 			return
 		case model.MessageTypePrivate, model.MessageTypeGroup: // 发送消息
-		// TODO: 发送到kafka的总消息队列中
+			if err := dao.SendMsgQueueWriter.WriteMessages(context.TODO(), kafka.Message{
+				// TODO: 后续将kafka优化为多个partition，使用hash算法根据key推送消息到partition中, 增加吞吐量
+				Key:   []byte(msg.From),
+				Value: data,
+			}); err != nil {
+				log.Errorf("conn[%s] send message to kafka error: %v", cwc.RequestId, err)
+			}
 		default:
-			log.Errorf("conn[%s] unknown message type: %v", cwc.RequestId, msg.MessageType)
+			log.Errorf("conn[%s] unknown message:%v type: %v", cwc.RequestId, string(data), msg.Type)
 		}
 	}
 }
 
 // HeartBeat 将用户上下线的消息放到redis中
 func (cwc *CommunicateWithClient) HeartBeat() {
+	// 将 uid-conn 加入到全局连接池中
+	GlobalConns.Add(cwc.UserUid, cwc.WsConn)
+	defer GlobalConns.Del(cwc.UserUid)
+
 	// 半个最大静默时间为一个周期，为用户在线状态续期
-	keepAlivePeriod := cwc.ClientMaxSilenceTime / 2
+	//keepAlivePeriod := cwc.ClientMaxSilenceTime / 2
+	keepAlivePeriod := time.Second
 	keepAliveTimer := time.NewTimer(keepAlivePeriod)
 	for {
 		select {
@@ -106,7 +115,26 @@ func (cwc *CommunicateWithClient) HeartBeat() {
 			}
 			keepAliveTimer.Reset(keepAlivePeriod)
 		case <-cwc.OnlineHeatBeatCloseCh:
+			log.Infof("conn[%s] online heartbeat close", cwc.RequestId)
 			return
+		}
+	}
+}
+
+func Send() {
+	for {
+		message, err := dao.RecvMsgQueueReader.ReadMessage(context.TODO())
+		if err != nil {
+			log.Errorf("read message from kafka error: %v", err)
+			continue
+		}
+		conn, exists := GlobalConns.Get(string(message.Key))
+		if !exists {
+			// 用户已下线，不进行消息发送
+			continue
+		}
+		if err := conn.Send(websocket.TextMessage, message.Value); err != nil {
+			log.Errorf("send message to user[UID:%s] error: %v", message.Key, err)
 		}
 	}
 }

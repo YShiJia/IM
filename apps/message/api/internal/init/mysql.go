@@ -1,38 +1,18 @@
 /**
  * @author ysj
  * @email 2239831438@qq.com
- * @createTime: 2025-04-19 18:13:41
+ * @date 2025-04-29 11:59:28
  */
 
-package db
+package init
 
 import (
 	"fmt"
 	conf "github.com/YShiJia/IM/apps/message/api/internal/config"
-	"github.com/YShiJia/IM/apps/message/api/model"
+	"github.com/YShiJia/IM/apps/message/api/internal/dao/db"
 	"github.com/YShiJia/IM/database"
-	"gorm.io/gorm"
+	"github.com/YShiJia/IM/model"
 )
-
-var (
-	IMDB *gorm.DB
-)
-
-type baseDAO struct {
-	tx *gorm.DB
-}
-
-// NewBaseDAO 获取新的baseDAO
-func NewBaseDAO(tx *gorm.DB) *baseDAO {
-	return &baseDAO{tx: tx}
-}
-
-func (b *baseDAO) getTx() *gorm.DB {
-	if (b == nil || b.tx == nil) && IMDB != nil {
-		return IMDB
-	}
-	return b.tx
-}
 
 // InitIMDB 初始化业务数据库
 func InitIMDB() (err error) {
@@ -43,15 +23,15 @@ func InitIMDB() (err error) {
 		conf.Conf.MysqlConf.Port,
 		conf.Conf.MysqlConf.Database,
 		conf.Conf.MysqlConf.Config)
-	IMDB, err = database.InitDB(dsn, model.GetModels())
+	db.IMDB, err = database.InitDB(dsn, model.GetMessageModels())
 	if err != nil {
 		return fmt.Errorf("init im db error: %w", err)
 	}
 	return nil
 }
 
-func InitTestCoreDB() (err error) {
+func InitTestIMDB() (err error) {
 	dsn := fmt.Sprintf("file::memory:?name=%s", conf.Conf.MysqlConf.Database)
-	IMDB, err = database.InitTestDB(dsn, model.GetModels())
+	db.IMDB, err = database.InitTestDB(dsn, model.GetMessageModels())
 	return err
 }

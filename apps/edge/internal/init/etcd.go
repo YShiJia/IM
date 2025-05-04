@@ -11,6 +11,8 @@ import (
 func InitEtcd() error {
 	cli, err := etcdv3.New(etcdv3.Config{
 		Endpoints:   []string{fmt.Sprintf("%s:%d", conf.Conf.EtcdConf.Host, conf.Conf.EtcdConf.Port)},
+		Username:    conf.Conf.EtcdConf.Username,
+		Password:    conf.Conf.EtcdConf.Password,
 		DialTimeout: conf.Conf.DialTimeOut,
 	})
 	if err != nil {

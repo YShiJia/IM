@@ -1,33 +1,36 @@
 /**
  * @author ysj
  * @email 2239831438@qq.com
- * @createTime: 2025-04-23 13:11:35
+ * @date 2025-04-29 12:00:53
  */
 
-package etcd
+package init
 
 import (
+	"context"
 	"fmt"
 	conf "github.com/YShiJia/IM/apps/message/api/internal/config"
+	"github.com/YShiJia/IM/apps/message/api/internal/dao/etcd"
 	log "github.com/sirupsen/logrus"
 	etcdv3 "go.etcd.io/etcd/client/v3"
 )
 
-var EtcdClient *etcdv3.Client
-
-type etcdDao struct{}
-
-var Etcd = &etcdDao{}
-
 func InitEtcd() error {
 	cli, err := etcdv3.New(etcdv3.Config{
 		Endpoints:   []string{fmt.Sprintf("%s:%d", conf.Conf.EtcdConf.Host, conf.Conf.EtcdConf.Port)},
-		DialTimeout: conf.Conf.DialTimeOut,
+		Username:    conf.Conf.EtcdConf.Username,
+		Password:    conf.Conf.EtcdConf.Password,
+		DialTimeout: conf.DialTimeOut,
 	})
 	if err != nil {
 		return fmt.Errorf("create etcd client failed, err:%v", err)
 	}
-	EtcdClient = cli
+	ctx, _ := context.WithTimeout(context.Background(), conf.ReqTimeOut)
+	if _, err = cli.Get(ctx, "ping"); err != nil {
+		return fmt.Errorf("get ping from etcd failed, err:%v", err)
+	}
+
+	etcd.EtcdClient = cli
 
 	log.Info("connect to etcd success")
 	return nil

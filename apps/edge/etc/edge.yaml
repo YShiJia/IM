@@ -1,6 +1,5 @@
 # 本服务名称前缀，同时也是redis中的edge-name-number-key,对应的是最大edge编号
 NamePrefix: im-edge
-
 IPPrefix: "10.120"
 
 # 本服务监听的节点端口
@@ -25,6 +24,8 @@ RedisConf:
 EtcdConf:
   Host: 10.120.0.40
   Port: 2379
+  Username: root
+  Password: heathyang
 
 KafkaConf:
   # 全局唯一
@@ -36,47 +37,16 @@ KafkaConf:
   # 独属于本节点
   RecvMessageQueue:
     Broker: 10.120.0.50:9092
-    # eg full name:  recv-message-queue-edge-1
-    TopicPrefix: im-recv-message-queue-edge
+    Topic:
     Replication: 1
     Partition: 1
+
+# eg full name:  recv-message-queue-edge-1
+RecvMessageQueueTopicPrefix: im-recv-message-queue-edge
+
+RedisUserInfoPrefix: im-user-uid
 
 # auth info
 AuthConf:
   AccessSecret: heathyang
   AccessExpire: 86400
-
-
-#
-##作为生产者
-##将消息发送到kafka的接收消息的mq中，该mq是总mq
-#SendMsgPusherConf:
-#  Name: im-edge-1-SendMsg
-#  Brokers:
-#    - 192.168.120.1:9092
-##  整个边缘服务的集群都往这个mq中发送队列
-#  Topic: im-edge-SendMsg
-#
-##作为消费者
-##消费来自系统的命令消息，和普通消息mq分开是为了具有时效性
-#RecvCmdMsgConsumerConf:
-#  Name: im-edge-1-RecvCmdMsg
-#  Brokers:
-#    - 192.168.120.1:9092
-#  Group: im-edge-1
-#  Topic: im-edge-1-RecvCmdMsg
-#  Offset: first
-#  Consumers: 3
-#  Processors: 3
-#
-##作为消费者
-##接收普通类型的消息（待发送消息）
-#RecvCommonMsgConsumerConf:
-#  Name: im-edge-1-RecvCommonMsg
-#  Brokers:
-#    - 192.168.120.1:9092
-#  Group: im-edge-1
-#  Topic: im-edge-1-RecvCommonMsg
-#  Offset: first
-#  Consumers: 3
-#  Processors: 3

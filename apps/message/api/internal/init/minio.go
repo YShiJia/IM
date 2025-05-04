@@ -1,15 +1,16 @@
 /**
  * @author ysj
  * @email 2239831438@qq.com
- * @createTime: 2025-04-19 21:04:24
+ * @date 2025-04-29 12:17:48
  */
 
-package fs
+package init
 
 import (
 	"context"
 	"fmt"
 	conf "github.com/YShiJia/IM/apps/message/api/internal/config"
+	"github.com/YShiJia/IM/apps/message/api/internal/dao/fs"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	log "github.com/sirupsen/logrus"
@@ -27,7 +28,8 @@ func InitMinio() error {
 		return err
 	}
 	log.Infof("连接minio成功：%#v\n", client)
-	buckets := []string{FileCommonBucket, FilePictureBucket, FileVideoBucket}
+	fs.MinioClient = client
+	buckets := []string{fs.FileCommonBucket, fs.FilePictureBucket, fs.FileVideoBucket}
 	for _, bucket := range buckets {
 		if err := initBucket(bucket); err != nil {
 			log.Errorf("初始化bucket[%s]失败 err: %v", bucket, err)
@@ -41,7 +43,7 @@ func InitMinio() error {
 func initBucket(bucketName string) error {
 	ctx := context.TODO()
 	// 先判断是否存在
-	exists, err := MinioClient.BucketExists(ctx, bucketName)
+	exists, err := fs.MinioClient.BucketExists(ctx, bucketName)
 	if err != nil {
 		log.Infof("获取bucket[%s]存在信息失败 err: %v", bucketName, err)
 		return fmt.Errorf("获取bucket[%s]存在信息失败 err: %v", bucketName, err)
@@ -50,7 +52,7 @@ func initBucket(bucketName string) error {
 		log.Infof("bucket[%s] 已存在无需创建", bucketName)
 		return nil
 	}
-	if err = MinioClient.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{Region: "cn-south-1", ObjectLocking: false}); err != nil {
+	if err = fs.MinioClient.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{Region: "cn-south-1", ObjectLocking: false}); err != nil {
 		log.Infof("创建bucket[%s]失败 err: %v", bucketName, err)
 		return fmt.Errorf("创建bucket[%s]失败 err: %v", bucketName, err)
 	}

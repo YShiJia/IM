@@ -9,7 +9,7 @@ import (
 )
 
 // InitKafka 获取kafka的Leader节点连接
-// 1. 获取连接
+// 1. 获取leader节点连接
 func InitKafka() error {
 	// 连接至Kafka集群的Leader节点
 	leaderConn, err := kafka.Dial("tcp", conf.Conf.KafkaConf.RecvMessageQueue.Broker)

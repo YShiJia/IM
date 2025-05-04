@@ -8,14 +8,12 @@ import (
 	"github.com/YShiJia/IM/apps/message/api/internal/dao/fs"
 	"github.com/YShiJia/IM/apps/message/api/internal/svc"
 	"github.com/YShiJia/IM/apps/message/api/internal/types"
-	"github.com/YShiJia/IM/apps/message/api/model"
 	"github.com/YShiJia/IM/lib/sign"
-	imModel "github.com/YShiJia/IM/model"
+	"github.com/YShiJia/IM/model"
 	log "github.com/sirupsen/logrus"
 	"github.com/zeromicro/go-zero/core/logx"
 	"gorm.io/gorm"
 	"mime/multipart"
-	"time"
 )
 
 type FileUploadLogic struct {
@@ -54,12 +52,6 @@ func (l *FileUploadLogic) FileUpload(req *types.FileUploadReq, data []byte, file
 	}
 	// 创建记录
 	fileM = &model.File{
-		Audit: imModel.Audit{
-			Creator:   "todo",
-			CreatedAt: time.Now(),
-			Updater:   "todo",
-			UpdatedAt: time.Now(),
-		},
 		Hash:   hash,
 		Bucket: bucketName,
 		Name:   req.FileName,

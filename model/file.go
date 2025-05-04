@@ -7,13 +7,11 @@
 package model
 
 import (
-	im "github.com/YShiJia/IM/model"
 	"gorm.io/gorm"
 )
 
 // File 文件
 type File struct {
-	im.Audit
 	ID        uint           `gorm:"comment:主键ID;"`
 	Hash      string         `gorm:"comment:唯一标识;size:500;uniqueIndex;not null;"`
 	Bucket    string         `gorm:"comment:存储桶;size:20;not null;"`

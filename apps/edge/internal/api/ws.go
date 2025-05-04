@@ -12,18 +12,20 @@ import (
 // MessageSRHandler 处理和发送来自客户端的联系
 func MessageSRHandler(ctx *libWs.WebContext) {
 	cwc := logic.CommunicateWithClient{
-		RequestId:             ctx.Value(libWs.RequestUUID),
-		WsConn:                ctx.Conn(),
-		UserUid:               ctx.Value(conf.AuthIMUserUID),
-		ClientSilenceTimer:    time.NewTimer(conf.Conf.ClientMaxSilenceTime),
-		ClientMaxSilenceTime:  conf.Conf.ClientMaxSilenceTime,
+		RequestId: ctx.Value(libWs.RequestUUID),
+		WsConn:    ctx.Conn(),
+		UserUid:   ctx.Value(conf.AuthIMUserUID),
+		//ClientSilenceTimer:    time.NewTimer(conf.Conf.ClientMaxSilenceTime),
+		ClientSilenceTimer: time.NewTimer(time.Hour),
+		//ClientMaxSilenceTime:  conf.Conf.ClientMaxSilenceTime,
+		ClientMaxSilenceTime:  time.Hour,
 		ErrCh:                 make(chan error),
 		CloseCh:               make(chan struct{}),
 		OnlineHeatBeatCloseCh: make(chan struct{}),
 	}
 	log.Infof("clientInfo=%+v conn[%s] start deal message", cwc, ctx.Value(libWs.RequestUUID))
 	defer func() {
-		close(cwc.CloseCh)
+		close(cwc.ErrCh)
 		close(cwc.CloseCh)
 		close(cwc.OnlineHeatBeatCloseCh)
 		if panicErr := recover(); panicErr != nil {

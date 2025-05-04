@@ -7,7 +7,6 @@
 package database
 
 import (
-	"github.com/uptrace/opentelemetry-go-extra/otelgorm"
 	"time"
 
 	"github.com/glebarez/sqlite"
@@ -64,10 +63,6 @@ func InitDB(dbDSN string, models []interface{}) (db *gorm.DB, err error) {
 	db, err = connectionDB(dbDSN)
 	if err != nil {
 		return
-	}
-
-	if err := db.Use(otelgorm.NewPlugin()); err != nil {
-		log.Warnf("failed to use otelgorm.NewPlugin(), Error: %s\n", err.Error()) // 非必须，不中断执行
 	}
 
 	if err = runMigrations(db, models); err != nil {

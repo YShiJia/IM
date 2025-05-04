@@ -115,7 +115,8 @@ func (wsc *wsConn) Close() error {
 	close(wsc.closeCh)
 
 	// 发送正常关闭的消息
-	return wsc.conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+	return wsc.conn.Close()
+	//return wsc.conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 }
 
 func (wsc *wsConn) CloseCh() <-chan struct{} {

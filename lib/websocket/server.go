@@ -91,7 +91,7 @@ func (w *wsServer) ServeHTTP(writer http.ResponseWriter, request *http.Request) 
 	webContext.Next()
 }
 
-// 服务入口逻辑
+// 服务入口逻辑，为当前ws设置一个uuid
 func entryLogic(ctx *WebContext) {
 	uid, err := uuid.NewUUID()
 	if err != nil {
@@ -104,7 +104,7 @@ func entryLogic(ctx *WebContext) {
 	log.Infof("request[%s] end", uid.String())
 }
 
-// 创建连接
+// 将普通http请求升级为websocket
 func (w *wsServer) createWsConn(ctx *WebContext) {
 	var respHeader http.Header
 	if protocol := ctx.R.Header.Get("Sec-Websocket-Protocol"); protocol != "" {
@@ -140,7 +140,7 @@ func (w *wsServer) createWsConn(ctx *WebContext) {
 	w.RemoveConn(reqUUID)
 }
 
-// 这个注册的handleFunc是如何连接，连接之后返回conn
+// Register 将具体业务逻辑注册到server中，重复注册相同的路径会覆盖
 func (w *wsServer) Register(method, path string, handler HandleFunc) {
 	w.routes.Register(method, path, handler)
 }
@@ -153,6 +153,7 @@ func (w *wsServer) Start() error {
 	return http.ListenAndServe(w.listenOn, w)
 }
 
+// Stop 仅仅只是销毁所有资源
 func (w *wsServer) Stop() error {
 	//关闭所有连接
 	w.connLocker.Lock()
@@ -169,7 +170,6 @@ func (w *wsServer) Stop() error {
 func (w *wsServer) addConn(key string, conn libWsconn.Conn) {
 	w.connLocker.Lock()
 	defer w.connLocker.Unlock()
-
 	if conn, ok := w.conns[key]; ok {
 		// 关闭原来的连接
 		conn.Close()
@@ -187,12 +187,5 @@ func (w *wsServer) getConn(key string) (libWsconn.Conn, bool) {
 func (w *wsServer) RemoveConn(key string) {
 	w.connLocker.Lock()
 	defer w.connLocker.Unlock()
-	//获取连接
-	conn, ok := w.conns[key]
-	if !ok {
-		return
-	}
-	//关闭连接，并删除
-	conn.Close()
 	delete(w.conns, key)
 }

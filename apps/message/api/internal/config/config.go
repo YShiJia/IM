@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+var (
+	DialTimeOut = time.Second * 3
+	ReqTimeOut  = time.Second * 3
+)
+
 type Config struct {
 	rest.RestConf
 
@@ -18,14 +23,13 @@ type Config struct {
 
 	Env string
 
-	DialTimeOut time.Duration // 连接超时
-	ReqTimeOut  time.Duration // 请求超时
+	EdgeNamePrefix string
 
 	RedisConf imModel.RedisConfig
 
 	EtcdConf imModel.EtcdConfig
 
-	KafkaConf imModel.KafkaConfig
+	SendMessageQueue imModel.KafkaConfig
 
 	MysqlConf imModel.MysqlConfig
 
@@ -34,7 +38,4 @@ type Config struct {
 	AuthConf imModel.AuthConfig
 }
 
-var Conf = Config{
-	DialTimeOut: time.Second * 3,
-	ReqTimeOut:  time.Second * 3,
-}
+var Conf = Config{}

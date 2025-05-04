@@ -4,7 +4,7 @@
  * @createTime: 2025-04-23 13:06:20
  */
 
-package rdb
+package redisdb
 
 import (
 	"github.com/redis/go-redis/v9"

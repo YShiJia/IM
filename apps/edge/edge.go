@@ -7,6 +7,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/YShiJia/IM/apps/edge/internal"
 	conf "github.com/YShiJia/IM/apps/edge/internal/config"
@@ -14,9 +15,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var configFile = flag.String("f", "./apps/edge/etc/edge.yaml", "the config file path")
+
 // 初始化任务
 var initTasks = []func() error{
-	initialize.InitConfig,
 	initialize.InitLog,
 	initialize.InitRedis,
 	initialize.InitEtcd,
@@ -25,6 +27,7 @@ var initTasks = []func() error{
 }
 
 func init() {
+	initialize.InitConfig(*configFile)
 	for _, initFunc := range initTasks {
 		if err := initFunc(); err != nil {
 			log.Fatal(err)
@@ -35,6 +38,8 @@ func init() {
 func main() {
 	edgeServer := internal.NewEdgeServer(fmt.Sprintf(":%d", conf.Conf.HttpPort))
 	defer edgeServer.Stop()
+	log.Infof("Starting server at :%d...\n", conf.Conf.HttpPort)
+
 	if err := edgeServer.Start(); err != nil {
 		log.Infof("edge server start : err %v", err)
 	}
