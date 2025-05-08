@@ -10,11 +10,13 @@ import "github.com/YShiJia/IM/model"
 
 // Message 消息
 type Message struct {
-	Type     model.MessageType `json:"type"`      // 消息类型
-	From     string            `json:"from"`      // 发送用户UID
-	To       string            `json:"to"`        // 接收用户UID/群聊UID
-	SendTime int64             `json:"send_time"` // 发送方发送消息时的时间戳，用于保证消息相对有序性
-	Content  []byte            `json:"content"`   // 消息内容
+	ID          uint              `json:"id"`
+	Type        model.MessageType `json:"type"`         // 消息类型
+	ContentType model.ContentType `json:"content_type"` // 内容类型
+	From        string            `json:"from"`         // 发送用户UID
+	To          string            `json:"to"`           // 接收用户UID/群聊UID
+	SendTime    int64             `json:"send_time"`    // 发送方发送消息时的时间戳，用于保证消息相对有序性
+	Content     []byte            `json:"content"`      // 消息内容
 }
 
 // FileContent 文件消息内容

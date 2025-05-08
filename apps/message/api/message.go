@@ -21,7 +21,6 @@ var initTasks = []func() error{
 	initialize.InitEtcd,
 	initialize.InitKafka,
 	initialize.InitIMDB,
-	initialize.InitMinio,
 	initialize.InitMessage,
 }
 

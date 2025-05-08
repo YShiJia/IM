@@ -8,10 +8,12 @@ package model
 
 var MessageModels = []interface{}{
 	&File{},
-	&Group{},
-	&User{},
+	&FileSlice{},
 	&Friend{},
 	&FriendGroup{},
+
+	&Group{},
+	&User{},
 	&GroupMember{},
 	&PrivateMessage{},
 	&GroupMessage{},
@@ -19,4 +21,18 @@ var MessageModels = []interface{}{
 
 func GetMessageModels() []interface{} {
 	return MessageModels
+}
+
+var FileModels = []interface{}{
+	&File{},
+	&FileSlice{},
+}
+
+func GetFileModels() []interface{} {
+	return FileModels
+}
+
+var SocialModels = []interface{}{
+	&Friend{},
+	&FriendGroup{},
 }

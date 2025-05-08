@@ -23,7 +23,8 @@ type Config struct {
 
 	Env string
 
-	EdgeNamePrefix string
+	EdgeNamePrefix      string
+	RedisUserInfoPrefix string
 
 	RedisConf imModel.RedisConfig
 
@@ -32,8 +33,6 @@ type Config struct {
 	SendMessageQueue imModel.KafkaConfig
 
 	MysqlConf imModel.MysqlConfig
-
-	MinioConf imModel.MinioConfig
 
 	AuthConf imModel.AuthConfig
 }

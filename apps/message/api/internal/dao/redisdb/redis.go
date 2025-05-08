@@ -7,7 +7,16 @@
 package redisdb
 
 import (
+	"context"
 	"github.com/redis/go-redis/v9"
 )
 
 var RDB *redis.Client
+
+func GetValue(ctx context.Context, key string) (string, error) {
+	val, err := RDB.Get(ctx, key).Result()
+	if err != nil {
+		return "", err
+	}
+	return val, nil
+}

@@ -16,7 +16,7 @@ import (
 
 // JwtAuthorize 认证并存储用户身份信息
 func JwtAuthorize(ctx *libWs.WebContext) {
-	token := ctx.R.Header.Get(conf.Authorization)
+	token := ctx.R.URL.Query().Get("token")
 	if token == "" {
 		ctx.Conn().Send(websocket.TextMessage, []byte(fmt.Sprintf("header %s is not exist", conf.Authorization)))
 		ctx.Abort()

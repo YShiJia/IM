@@ -13,6 +13,7 @@ import (
 	conf "github.com/YShiJia/IM/apps/message/api/internal/config"
 	"github.com/YShiJia/IM/apps/message/api/internal/dao/etcd"
 	"github.com/YShiJia/IM/apps/message/api/internal/dao/mq"
+	"github.com/YShiJia/IM/apps/message/api/internal/logic/message"
 	"github.com/YShiJia/IM/model"
 	"github.com/segmentio/kafka-go"
 	log "github.com/sirupsen/logrus"
@@ -30,6 +31,7 @@ func InitMessage() error {
 	if err := WatchEdgeService(); err != nil {
 		return err
 	}
+	go message.Transfer()
 	return nil
 }
 

@@ -79,8 +79,8 @@ func createWriterAndReader() error {
 	dao.RecvMsgQueueReader = kafka.NewReader(kafka.ReaderConfig{
 		Brokers: []string{conf.Conf.KafkaConf.RecvMessageQueue.Broker},
 		// 这里有一个薄弱点：当前是每一个edge都拥有自己的一个topic，都是从头开始消费
-		// 如果后续
-		GroupID:  conf.Conf.NamePrefix, // 统一使用edge作为消费者组id
+		// 如果后续使用同一个topic，就需要使用 im-edge作为共同的消费组id
+		GroupID:  conf.Conf.Name,
 		Topic:    conf.Conf.KafkaConf.RecvMessageQueue.Topic,
 		MaxBytes: 10e6, // 10MB
 	})

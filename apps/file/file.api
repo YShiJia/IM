@@ -1,0 +1,108 @@
+syntax = "v1"
+
+info (
+	title:  "im.file 服务"
+	author: "ysj"
+	email:  "2239831438@qq.com"
+)
+
+@server (
+	middleware: Auth
+)
+service file {
+	// 根据Hash值获取文件信息
+	@handler GetFileInfo
+	get /file/info/:hash (GetFileInfoReq) returns (GetFileInfoResp)
+
+	// 单文件上传（无需切片）
+	@handler FileUpload
+	post /file/upload (FileUploadReq) returns (FileUploadResp)
+
+	// 单文件下载（无需切片）
+	@handler FileDownload
+	get /file/download/:filename (FileDownloadReq) returns (FileDownloadResp)
+
+	// 上传文件切片准备（创建file记录）
+	@handler FileSliceUploadPrepare
+	post /file/slice/upload/prepare (FileSliceUploadPrepareReq) returns (FileSliceUploadPrepareResp)
+
+	// 上传文件切片（上传二进制数据）
+	@handler FileSliceUpload
+	post /file/slice/upload (FileSliceUploadReq) returns (FileSliceUploadResp)
+
+	// 下载文件切片（返回二进制数据）
+	@handler FileSliceDownload
+	get /file/slice/:hash (FileSliceDownloadReq) returns (FileSliceDownloadResp)
+}
+
+type GetFileInfoReq {
+	Hash string `path:"hash"`
+}
+
+type FileSlice {
+	Hash  string `json:"hash"`
+	Order uint8  `json:"order"`
+}
+
+type GetFileInfoResp {
+	Hash       string      `json:"hash"`
+	FileSlices []FileSlice `json:"fileslices"`
+}
+
+// 单文件上传req
+type FileUploadReq {
+	FileName string `form:"filename"`
+	Size     int64  `form:"size"`
+}
+
+// 单文件上传resp
+type FileUploadResp {
+	Hash       string      `json:"hash"`
+	FileSlices []FileSlice `json:"fileslices"`
+}
+
+// 单文件下载req
+type FileDownloadReq {
+	FileName string `path:"filename"`
+}
+
+// 单文件下载resp
+type FileDownloadResp {}
+
+// 文件分片上传准备req
+type FileSliceUploadPrepareReq {
+	FileName string `json:"filename"`
+	Size     int64  `json:"size"`
+	Hash     string `json:"hash"`
+}
+
+type FileSliceUploadPrepareResp {
+	FileName string `json:"filename"`
+	Size     int64  `json:"size"`
+	Hash     string `json:"hash"`
+}
+
+// 文件分片上传req
+// filehash 是 file的hash值
+// size 是 file_slice的size
+// order 是 file_slice的order
+type FileSliceUploadReq {
+	FileHash string `form:"filehash"`
+	Size     int64  `form:"size"`
+	Order    uint8  `form:"order"`
+}
+
+// 返回的是file_slice数据
+// hash 是file_slice的hash值
+// order 是file_slice的order
+type FileSliceUploadResp {
+	Hash  string `json:"hash"`
+	Order uint8  `json:"order"`
+}
+
+type FileSliceDownloadReq {
+	Hash string `path:"hash"`
+}
+
+type FileSliceDownloadResp {}
+

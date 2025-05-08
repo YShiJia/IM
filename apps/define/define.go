@@ -7,6 +7,5 @@
 package define
 
 const (
-	AuthIMUserUID = "AuthIMUserUID"
 	Authorization = "Authorization"
 )

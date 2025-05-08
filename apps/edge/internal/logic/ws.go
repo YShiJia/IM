@@ -85,7 +85,6 @@ func (cwc *CommunicateWithClient) Recv() {
 			return
 		case model.MessageTypePrivate, model.MessageTypeGroup: // 发送消息
 			if err := dao.SendMsgQueueWriter.WriteMessages(context.TODO(), kafka.Message{
-				// TODO: 后续将kafka优化为多个partition，使用hash算法根据key推送消息到partition中, 增加吞吐量
 				Key:   []byte(msg.From),
 				Value: data,
 			}); err != nil {
@@ -104,8 +103,7 @@ func (cwc *CommunicateWithClient) HeartBeat() {
 	defer GlobalConns.Del(cwc.UserUid)
 
 	// 半个最大静默时间为一个周期，为用户在线状态续期
-	//keepAlivePeriod := cwc.ClientMaxSilenceTime / 2
-	keepAlivePeriod := time.Second
+	keepAlivePeriod := cwc.ClientMaxSilenceTime / 2
 	keepAliveTimer := time.NewTimer(keepAlivePeriod)
 	for {
 		select {

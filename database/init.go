@@ -30,6 +30,7 @@ func connectionDB(path string) (db *gorm.DB, err error) {
 			DriverName: "mysql",
 			DSN:        path,
 		}), &gorm.Config{
+			Logger:                 logger.Default.LogMode(logger.Info),
 			SkipDefaultTransaction: true,
 			CreateBatchSize:        64,
 		})

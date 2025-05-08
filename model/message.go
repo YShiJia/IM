@@ -37,13 +37,21 @@ type TextContent struct {
 	Text string `json:"text"`
 }
 
+// ImageContent 图片文件
+type ImageContent struct {
+	Name string `json:"name"`
+	Size int64  `json:"size"`
+	Url  string `json:"url"`
+}
+
+// FileContent 文件
 type FileContent struct {
 	Name   string    `json:"name"`
 	Size   int64     `json:"size"`
 	Slices FileSlice `json:"slices"`
 }
 
-type FileSlice struct {
+type ContentFileSlice struct {
 	Hash  string `json:"hash"`
 	Order uint8  `json:"order"`
 }

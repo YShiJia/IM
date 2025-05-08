@@ -18,7 +18,7 @@ service message-api {
 
 	// 文件下载
 	@handler FileDownload
-	post /file/download/:hash (FileDownloadReq) returns (FileDownloadResp)
+	get /file/download/:hash (FileDownloadReq) returns (FileDownloadResp)
 
 	// 文件上传前基本信息处理
 	@handler FileCheck
