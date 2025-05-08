@@ -6,16 +6,22 @@
 
 package model
 
+const (
+	SourceUserRegister   = "用户注册"
+	SourceSystemRegister = "系统注册"
+)
+
 type User struct {
-	ID     uint   `gorm:"comment:主键ID;"`
-	UID    string `gorm:"comment:用户UID;size:20;uniqueIndex;not null;"`
-	Age    uint   `gorm:"comment:年龄;size:3;not null;"`
-	Name   string `gorm:"comment:用户名;size:20;not null;"`
-	Avatar string `gorm:"comment:头像;size:100;not null;"`
-	Gender bool   `gorm:"comment:性别;size:1;not null;"`
-	Email  string `gorm:"comment:邮箱;size:30;null;"`
-	Sign   string `gorm:"comment:个性签名;size:100;null;"`
-	Source string `gorm:"comment:来源;size:20;not null;"`
+	ID       uint   `gorm:"comment:主键ID;"`
+	UID      string `gorm:"comment:用户UID;size:20;uniqueIndex;not null;"`
+	Password string `gorm:"comment:密码,MD5加密;size:40;not null;"`
+	Age      uint   `gorm:"comment:年龄;not null;"`
+	Name     string `gorm:"comment:用户名;size:20;not null;"`
+	Avatar   string `gorm:"comment:头像URL;size:100;not null;"`
+	Gender   bool   `gorm:"comment:性别;size:1;not null;"`
+	Email    string `gorm:"comment:邮箱;size:30;null;"`
+	Sign     string `gorm:"comment:个性签名;size:100;null;"`
+	Source   string `gorm:"comment:来源;size:20;not null;"`
 }
 
 type FriendGroup struct {

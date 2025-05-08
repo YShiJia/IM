@@ -17,6 +17,11 @@ const (
 	charSet          = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
+var (
+	User  = NewUUID("uu")
+	Group = NewUUID("gu")
+)
+
 type UUID struct {
 	prefix string
 	length int

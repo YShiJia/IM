@@ -1,6 +1,6 @@
-Name: im-file
+Name: im-social
 Host: 0.0.0.0
-Port: 15000
+Port: 16000
 #  最大连接数
 MaxConns: 1000
 # 服务器最大传输字节 10 MB
@@ -8,10 +8,6 @@ MaxBytes: 10485760
 # 超时时间 10s
 Timeout: 10000
 
-# 单次传输文件(切片)最大大小 MB
-MaxFileBytes: 5
-# 总文件最大大小 MB
-MaxTotalFileBytes: 50
 # 集群网段
 IPPrefix: "10.120"
 
@@ -31,15 +27,7 @@ MysqlConf:
   Config: charset=utf8&parseTime=True&loc=Local
   MaxConns: 100
 
-MinioConf:
-  Host: 10.120.0.60
-  Port: 9000
-  AccessKeyID: heathyang
-  SecretAccessKey: heathyang
-  UseSSL: false
-
 # auth info
 AuthConf:
   AccessSecret: heathyang
   AccessExpire: 86400
-

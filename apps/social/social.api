@@ -1,219 +1,228 @@
 syntax = "v1"
 
-info(
-    title: "im.social 服务"
-    author: "ysj"
-    email: "2239831438@qq.com"
+info (
+	title:  "im.social 服务"
+	author: "ysj"
+	email:  "2239831438@qq.com"
 )
 
-
-service entry {
-    // 登录
-    @handler Login
-    post /entry/login (LoginReq) returns (LoginResp)
-
-    // 注册
-    @handler Register
-    post /entry/register (RegisterReq) returns (RegisterResp)
-}
-
-type LoginReq {
-    Username string `json:"username"`
-    Password string `json:"password"`
-}
-type LoginResp {
-    Token string `json:"token"`
-}
-
-type RegisterReq {
-    Username string `json:"username"`
-    Email string `json:"email"`
-    Password string `json:"password"`
-}
-type RegisterResp {
-    Token string `json:"token"`
-}
-
-
-@server(
-    middleware: Auth
-)
 service social {
-    // 修改用户资料
-    @handler ChangeUserInfo
-    put /user/info (ChangeUserInfoReq) returns (ChangeUserInfoResp)
+	// 登录
+	@handler Login
+	post /entry/login (LoginReq) returns (LoginResp)
 
-    // 搜索用户
-    @handler SearchUser
-    get /user/search/:search (SearchUserReq) returns (SearchUserResp)
-
-    // 添加好友
-    @handler AddFriend
-    post /friend/add (AddFriendReq) returns (AddFriendResp)
-
-    // 更新好友分组（为单边操作）
-    @handler UpdateFriendGroup
-    put /friend/group (UpdateFriendGroupReq) returns (UpdateFriendGroupResp)
-
-    // 拉黑好友关系（为单边操作）
-    @handler BlockFriend
-    put /friend/block (BlockFriendReq) returns (BlockFriendResp)
-
-    // 删除好友
-    @handler DeleteFriend
-    delete /friend/delete (DeleteFriendReq) returns (DeleteFriendResp)
-
-    // 创建群聊
-    @handler CreateGroup
-    post /group/create (CreateGroupReq) returns (CreateGroupResp)
-
-    // 解散群聊
-    @handler DismissGroup
-    put /group/dismiss (DismissGroupReq) returns (DismissGroupResp)
-
-    // 删除群聊
-    @handler DeleteGroup
-    delete /group/delete (DeleteGroupReq) returns (DeleteGroupResp)
-
-    // 删除群聊成员
-    @handler DeleteGroupMember
-    delete /group/member/delete (DeleteGroupMemberReq) returns (DeleteGroupMemberResp)
-
-    // 获取群聊成员列表
-    @handler GetGroupMemberList
-    get /group/member/list/:group_id (GetGroupMemberListReq) returns (GetGroupMemberListResp)
-
-    // 拉取历史私聊消息
-    @handler GetHistoryPrivateChat
-    post /chat/history/private (GetHistoryPrivateChatReq) returns (GetHistoryPrivateChatResp)
-
-    // 拉取历史群聊消息
-    @handler GetHistoryGroupChat
-    post /chat/history/group (GetHistoryGroupChatReq) returns (GetHistoryGroupChatResp)
+	// 注册
+	@handler Register
+	post /entry/register (RegisterReq) returns (RegisterResp)
 }
 
 type User {
-    UID string `json:"uid"`
-    Avatar string `json:"avatar"`
-    Username string `json:"username"`
-    Email string `json:"email"`
-    Age uint8 `json:"age"`
-    Sign string `json:"sign"`
-    Gender bool `json:"gender"`
+	UID      string `json:"uid"`
+	Avatar   string `json:"avatar"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Age      uint   `json:"age"`
+	Sign     string `json:"sign"`
+	Gender   bool   `json:"gender"`
+}
+
+type LoginReq {
+	UID      string `json:"uid"`
+	Password string `json:"password"`
+}
+
+type LoginResp {
+	User    User   `json:"user"`
+	Token   string `json:"token"`
+	Message string `json:"message"`
+}
+
+type RegisterReq {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type RegisterResp {
+	User     User   `json:"user"`
+	Password string `json:"password"`
+	Message  string `json:"message"`
+}
+
+@server (
+	middleware: Auth
+)
+service social {
+	// 修改用户资料
+	@handler ChangeUserInfo
+	put /user/info (ChangeUserInfoReq) returns (ChangeUserInfoResp)
+
+	// 搜索用户
+	@handler SearchUser
+	get /user/search/:search (SearchUserReq) returns (SearchUserResp)
+
+	// 添加好友
+	@handler AddFriend
+	post /friend/add (AddFriendReq) returns (AddFriendResp)
+
+	// 更新好友分组（为单边操作）
+	@handler UpdateFriendGroup
+	put /friend/group (UpdateFriendGroupReq) returns (UpdateFriendGroupResp)
+
+	// 拉黑好友关系（为单边操作）
+	@handler BlockFriend
+	put /friend/block (BlockFriendReq) returns (BlockFriendResp)
+
+	// 删除好友
+	@handler DeleteFriend
+	delete /friend/delete (DeleteFriendReq) returns (DeleteFriendResp)
+
+	// 创建群聊
+	@handler CreateGroup
+	post /group/create (CreateGroupReq) returns (CreateGroupResp)
+
+	// 解散群聊
+	@handler DismissGroup
+	put /group/dismiss (DismissGroupReq) returns (DismissGroupResp)
+
+	// 删除群聊
+	@handler DeleteGroup
+	delete /group/delete (DeleteGroupReq) returns (DeleteGroupResp)
+
+	// 删除群聊成员
+	@handler DeleteGroupMember
+	delete /group/member/delete (DeleteGroupMemberReq) returns (DeleteGroupMemberResp)
+
+	// 获取群聊成员列表
+	@handler GetGroupMemberList
+	get /group/member/list/:group_id (GetGroupMemberListReq) returns (GetGroupMemberListResp)
+
+	// 拉取历史私聊消息
+	@handler GetHistoryPrivateChat
+	post /chat/history/private (GetHistoryPrivateChatReq) returns (GetHistoryPrivateChatResp)
+
+	// 拉取历史群聊消息
+	@handler GetHistoryGroupChat
+	post /chat/history/group (GetHistoryGroupChatReq) returns (GetHistoryGroupChatResp)
 }
 
 type ChangeUserInfoReq {
-    User User `json:"user"`
+	User User `json:"user"`
 }
+
 type ChangeUserInfoResp {
-    User User `json:"user"`
+	User User `json:"user"`
 }
 
 type SearchUserReq {
-    Search string `path:"search"`
+	Search string `path:"search"`
 }
+
 // 默认返回前10个用户
 type SearchUserResp {
-    Users []User `json:"users"`
+	Users []User `json:"users"`
 }
 
 type AddFriendReq {
-    UID string `json:"uid"`
-    FriendUID string `json:"friend_uid"`
+	UID       string `json:"uid"`
+	FriendUID string `json:"friend_uid"`
 }
-type AddFriendResp {
-}
+
+type AddFriendResp {}
 
 type UpdateFriendGroupReq {
-    UID string `json:"uid"`
-    FriendUID string `json:"friend_uid"`
-    FriendGroupUid string `json:"friend_group_uid"`
+	UID            string `json:"uid"`
+	FriendUID      string `json:"friend_uid"`
+	FriendGroupUid string `json:"friend_group_uid"`
 }
-type UpdateFriendGroupResp {
-}
+
+type UpdateFriendGroupResp {}
 
 type BlockFriendReq {
-    UID string `json:"uid"`
-    FriendUID string `json:"friend_uid"`
+	UID       string `json:"uid"`
+	FriendUID string `json:"friend_uid"`
 }
-type BlockFriendResp {
-}
+
+type BlockFriendResp {}
 
 type DeleteFriendReq {
-    UID string `json:"uid"`
-    FriendUID string `json:"friend_uid"`
-}
-type DeleteFriendResp {
+	UID       string `json:"uid"`
+	FriendUID string `json:"friend_uid"`
 }
 
+type DeleteFriendResp {}
+
 type CreateGroupReq {
-    UserUid string `json:"user_uid"`
-    Name string `json:"name"`
-    Avatar string `json:"avatar"`
+	UserUid string `json:"user_uid"`
+	Name    string `json:"name"`
+	Avatar  string `json:"avatar"`
 }
+
 type CreateGroupResp {
-    Uid string `json:"uid"`
-    Name string `json:"name"`
-    Avatar string `json:"avatar"`
+	Uid    string `json:"uid"`
+	Name   string `json:"name"`
+	Avatar string `json:"avatar"`
 }
 
 type DismissGroupReq {
-    UserUid string `json:"user_uid"`
-    GroupUid string `json:"group_uid"`
-}
-type DismissGroupResp {
+	UserUid  string `json:"user_uid"`
+	GroupUid string `json:"group_uid"`
 }
 
+type DismissGroupResp {}
+
 type DeleteGroupReq {
-    UserUid string `json:"user_uid"`
-    GroupUid string `json:"group_uid"`
+	UserUid  string `json:"user_uid"`
+	GroupUid string `json:"group_uid"`
 }
-type DeleteGroupResp {
-}
+
+type DeleteGroupResp {}
 
 // 删除群聊成员
 type DeleteGroupMemberReq {
-    UserUid string `json:"user_uid"`
-    GroupUid string `json:"group_uid"`
-    MemberUid string `json:"member_uid"`
+	UserUid   string `json:"user_uid"`
+	GroupUid  string `json:"group_uid"`
+	MemberUid string `json:"member_uid"`
 }
-type DeleteGroupMemberResp {
-}
+
+type DeleteGroupMemberResp {}
 
 // 获取群聊成员列表
 type GetGroupMemberListReq {
-    GroupUid string `path:"group_id"`
+	GroupUid string `path:"group_id"`
 }
+
 type GetGroupMemberListResp {
-    Members []User `json:"members"`
+	Members []User `json:"members"`
 }
 
 type Message {
-    ID uint `json:"id"`
-    Type uint8 `json:"type"`                  // 消息类型
-    ContentType uint8 `json:"type"`           // 内容类型
-    From string `json:"from"`                 // 发送者UID
-    To string `json:"to"`                     // 接收者UID/群聊UID
-    SendTime uint64 `json:"send_time"`        // 消息发送时间戳
-    Content []byte `json:"content"`           //  消息内容
+	ID          uint   `json:"id"`
+	Type        uint8  `json:"type"` // 消息类型
+	ContentType uint8  `json:"type"` // 内容类型
+	From        string `json:"from"` // 发送者UID
+	To          string `json:"to"` // 接收者UID/群聊UID
+	SendTime    uint64 `json:"send_time"` // 消息发送时间戳
+	Content     []byte `json:"content"` //  消息内容
 }
 
 type GetHistoryPrivateChatReq {
-    UserUID string `json:"user_uid"`
-    FriendUID string `json:"friend_uid"`
-    Marker string `json:"marker"`
+	UserUID   string `json:"user_uid"`
+	FriendUID string `json:"friend_uid"`
+	Marker    string `json:"marker"`
 }
+
 type GetHistoryPrivateChatResp {
-    Messages []Message `json:"messages"`
+	Messages []Message `json:"messages"`
 }
 
 type GetHistoryGroupChatReq {
-    UserUID string `json:"user_uid"`
-    GroupUID string `json:"group_uid"`
-    Marker string `json:"marker"`
-}
-type GetHistoryGroupChatResp {
-    Messages []Message `json:"messages"`
+	UserUID  string `json:"user_uid"`
+	GroupUID string `json:"group_uid"`
+	Marker   string `json:"marker"`
 }
 
+type GetHistoryGroupChatResp {
+	Messages []Message `json:"messages"`
+}
 
